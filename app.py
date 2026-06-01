@@ -266,10 +266,15 @@ UI_TEMPLATE = """
     {% raw %}
     <script>
         function executeDynamicSearch() {
-            const query = document.getElementById('liveSearchQuery').value.toLowerCase();
-            const tableRows = document.getElementById('genomicTableBody').getElementsByTagName('tr');
-            for(let row of tableRows) {
-                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+            var query = document.getElementById('liveSearchQuery').value.toLowerCase();
+            var tableRows = document.getElementById('genomicTableBody').getElementsByTagName('tr');
+            for(var i = 0; i < tableRows.length; i++) {
+                var row = tableRows[i];
+                if(row.innerText.toLowerCase().includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
             }
         }
 
@@ -279,19 +284,19 @@ UI_TEMPLATE = """
         });
 
         document.addEventListener("DOMContentLoaded", function() {
-            const categoryLabels = [];
-            const absoluteScores = [];
+            var categoryLabels = [];
+            var absoluteScores = [];
             
-            const rows = document.getElementById('genomicTableBody').getElementsByTagName('tr');
-            for(let r of rows) {
-                const dataCells = r.getElementsByTagName('td');
+            var rows = document.getElementById('genomicTableBody').getElementsByTagName('tr');
+            for(var i = 0; i < rows.length; i++) {
+                var dataCells = rows[i].getElementsByTagName('td');
                 if(dataCells.length > 1) {
                     categoryLabels.push(dataCells[1].innerText);
                     absoluteScores.push(parseFloat(dataCells[6].innerText));
                 }
             }
 
-            const ctxElement = document.getElementById('genomicsAnalyticsChart').getContext('2d');
+            var ctxElement = document.getElementById('genomicsAnalyticsChart').getContext('2d');
             new Chart(ctxElement, {
                 type: 'bar',
                 data: {
@@ -341,8 +346,4 @@ def load_unified_viewport():
             except Exception:
                 pass
                 
-    computed_metrics = execute_computational_pipeline(incoming_string_stream)
-    return render_template_string(UI_TEMPLATE, data=computed_metrics)
-
-@app.route('/api/v1/analytics', methods=['GET'])
-def pull_raw_j
+    computed_metrics = execute_computati
