@@ -34,12 +34,12 @@ def execute_computational_pipeline(file_content=""):
         current_ccf = item["ccf"]
         current_tpm = item["tpm"]
         
-        # Boost and tweak parameters if mutations are discovered inside the uploaded data file stream
+        # Boost parameters if mutations are discovered inside the uploaded data file stream
         if extracted_genes and item["gene"] in extracted_genes:
             current_ccf = min(1.00, current_ccf * 1.1)
             current_tpm = current_tpm * 1.2
 
-        # Stage 7 Filter: Strict requirement of Transcripts Per Million > 1.0
+        # Stage 7 Filter: Requirement of Transcripts Per Million > 1.0
         if current_tpm <= 1.0:
             continue
 
@@ -79,7 +79,7 @@ UI_TEMPLATE = """
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700&family=JetBrains+Mono:wght=400;700&display=swap');
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: radial-gradient(circle at top left, #0b112c 0%, #050716 100%); 
@@ -135,7 +135,7 @@ UI_TEMPLATE = """
                         <input type="file" name="genomic_file" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required>
                         <div class="space-y-1">
                             <i class="fa-solid fa-dna text-xl text-purple-500/60 group-hover:text-cyan-400 transition-colors"></i>
-                            <span class="block text-xs font-semibold text-slate-300 id='fileNameDisplay'">Choose sequencing file</span>
+                            <span id="fileNameDisplay" class="block text-xs font-semibold text-slate-300">Choose sequencing file</span>
                             <span class="block text-[9px] text-slate-500">Supports standard genomic text logs</span>
                         </div>
                     </div>
@@ -144,13 +144,6 @@ UI_TEMPLATE = """
                         <i class="fa-solid fa-play"></i> Execute Ingestion Pipeline
                     </button>
                 </form>
-
-                <script>
-                    document.getElementById('fileInput').addEventListener('change', function(e){
-                        var name = e.target.files[0] ? e.target.files[0].name : "Selected";
-                        alert("File staged successfully: " + name + "\\n\\nClick the 'Execute Ingestion Pipeline' button below to load graphics.");
-                    });
-                </script>
 
                 <div class="text-[10px] text-slate-500 flex justify-between items-center font-mono-variant border-t border-purple-900/20 pt-1">
                     <span>Target state context</span>
@@ -280,6 +273,11 @@ UI_TEMPLATE = """
             }
         }
 
+        document.getElementById('fileInput').addEventListener('change', function(e){
+            var name = e.target.files[0] ? e.target.files[0].name : "Choose sequencing file";
+            document.getElementById('fileNameDisplay').innerText = name;
+        });
+
         document.addEventListener("DOMContentLoaded", function() {
             const categoryLabels = [];
             const absoluteScores = [];
@@ -343,4 +341,8 @@ def load_unified_viewport():
             except Exception:
                 pass
                 
-    computed_metrics = execute_computational_pi
+    computed_metrics = execute_computational_pipeline(incoming_string_stream)
+    return render_template_string(UI_TEMPLATE, data=computed_metrics)
+
+@app.route('/api/v1/analytics', methods=['GET'])
+def pull_raw_j
