@@ -32,10 +32,10 @@ def execute_computational_pipeline(file_content=""):
 
     processed_candidates = []
     for item in base_variants:
-        # Boost priority or isolate specific targets if explicitly provided via data ingestion channel
         current_ccf = item["ccf"]
         current_tpm = item["tpm"]
         
+        # Boost matrix metrics if mutations are explicitly discovered in the text stream
         if extracted_genes and item["gene"] in extracted_genes:
             current_ccf = min(1.00, current_ccf * 1.1)
             current_tpm = current_tpm * 1.2
@@ -56,16 +56,10 @@ def execute_computational_pipeline(file_content=""):
         score = round(min(0.999, max(0.001, raw_score)), 3)
 
         processed_candidates.append({
-            "rank": 0,
-            "gene": item["gene"],
-            "mutation": item["mutation"],
-            "allele": item["allele"],
-            "peptide": item["peptide"],
-            "ic50": item["ic50"],
-            "dai": dai,
-            "tpm": round(current_tpm, 1),
-            "ccf": round(current_ccf, 2),
-            "score": score
+            "rank": 0, "gene": item["gene"], "mutation": item["mutation"],
+            "allele": item["allele"], "peptide": item["peptide"],
+            "ic50": item["ic50"], "dai": dai, "tpm": round(current_tpm, 1),
+            "ccf": round(current_ccf, 2), "score": score
         })
 
     # Sort descending based on calculated programmatic ranking values
@@ -120,7 +114,7 @@ UI_TEMPLATE = """
         </div>
         <div class="flex items-center space-x-4">
             <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-cyan-950/50 text-cyan-400 border border-cyan-800/40">
-                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Pipeline Online
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Service Active
             </span>
         </div>
     </header>
@@ -137,17 +131,17 @@ UI_TEMPLATE = """
                     <p class="text-[11px] text-slate-400 mt-1">Submit high-throughput sequencing configurations (VCF, SNP, CSV, PDF)</p>
                 </div>
 
-                <form action="/" method="POST" enctype="multipart/form-data" class="relative group border border-dashed border-purple-500/20 hover:border-cyan-500/40 bg-[#050716]/40 p-4 rounded-xl transition-all cursor-pointer text-center">
-                    <input type="file" name="genomic_file" onchange="this.form.submit()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                <form id="ingestionForm" action="/" method="POST" enctype="multipart/form-data" class="relative group border border-dashed border-purple-500/20 hover:border-cyan-500/40 bg-[#050716]/40 p-4 rounded-xl transition-all cursor-pointer text-center">
+                    <input type="file" name="genomic_file" onchange="document.getElementById('ingestionForm').submit();" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                     <div class="space-y-2">
                         <i class="fa-solid fa-dna text-xl text-purple-500/60 group-hover:text-cyan-400 transition-colors animate-pulse"></i>
                         <span class="block text-xs font-semibold text-slate-300">Drop clinical sequence matrix</span>
-                        <span class="block text-[10px] text-slate-500">Automated structural regex matching validation</span>
+                        <span class="block text-[10px] text-slate-500">Automated structural validation</span>
                     </div>
                 </form>
 
                 <div class="text-[10px] text-slate-500 flex justify-between items-center font-mono-variant border-t border-purple-900/20 pt-2">
-                    <span>Status: Ingestion Ready</span>
+                    <span>Status: Dynamic Processing Mode</span>
                     <span class="text-purple-400">v4.1-pan</span>
                 </div>
             </div>
@@ -189,15 +183,14 @@ UI_TEMPLATE = """
                     <p class="text-[11px] text-slate-400 mt-1">Real-time optimization models based on input parameters</p>
                 </div>
                 <div class="bg-[#050716]/60 rounded-xl p-3 border border-purple-900/30 font-mono-variant text-[10px] text-slate-300 space-y-1.5">
-                    <div class="flex items-center justify-between"><span class="text-cyan-400">[SYSTEM]</span><span>Variants: 14,208</span></div>
+                    <div class="flex items-center justify-between"><span class="text-cyan-400">[SYSTEM]</span><span>Variants Analyzed</span></div>
                     <div class="flex items-center justify-between"><span class="text-purple-400">[FILTER]</span><span>Expressed: {{ data|length }} Matches</span></div>
-                    <div class="flex items-center justify-between"><span class="text-amber-400">[RANK 1]</span><span class="font-bold">KRAS Enriched</span></div>
+                    <div class="flex items-center justify-between"><span class="text-amber-400">[PIPELINE]</span><span class="font-bold">Matrix Evaluated</span></div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            
+        <div class="grid grid-cols-1 grid-cols-3 gap-6">
             <div class="xl:col-span-2 glass-panel rounded-2xl overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-purple-900/20 bg-[#0d1430]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -206,7 +199,7 @@ UI_TEMPLATE = """
                     </div>
                     <div class="relative w-full sm:w-64">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-purple-400/60"></i>
-                        <input type="text" id="liveSearchQuery" oninput="executeDynamicSearch()" placeholder="Search target gene gene..." class="w-full text-xs bg-[#050716]/60 text-slate-200 pl-8 pr-3 py-1.5 rounded-xl border border-purple-900/40 focus:border-cyan-500/60 outline-none transition-all font-mono-variant">
+                        <input type="text" id="liveSearchQuery" oninput="executeDynamicSearch()" placeholder="Search target gene..." class="w-full text-xs bg-[#050716]/60 text-slate-200 pl-8 pr-3 py-1.5 rounded-xl border border-purple-900/40 focus:border-cyan-500/60 outline-none transition-all font-mono-variant">
                     </div>
                 </div>
 
@@ -345,7 +338,6 @@ def pull_raw_json_feed():
     return jsonify({"status": "success", "nodes": execute_computational_pipeline()})
 
 if __name__ == '__main__':
-    # Dynamic port extraction configuration matching Render proxy constraints
     target_network_port = int(os.environ.get('PORT', 5000))
     app.run(host="0.0.0.0", port=target_network_port, debug=False)
-        
+    
