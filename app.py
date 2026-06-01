@@ -13,7 +13,7 @@ logger = logging.getLogger("OmniGenEngine")
 app = Flask(__name__)
 
 # =====================================================================
-# PIPELINE ENGINES BLOCK (Stage 4 to 9 Processing Core)
+# CORE PIPELINE BIOLOGICAL ENGINE LOGIC
 # =====================================================================
 
 @dataclass
@@ -187,7 +187,7 @@ def execute_vaccine_design_pipeline(patient_variants: List[SomaticVariant], pati
     return sorted(validated_candidates, key=lambda x: x.total_score, reverse=True)
 
 # =====================================================================
-# CONTROLLER ROUTING HANDLERS
+# VIEW ROUTING TARGET ENDPOINTS
 # =====================================================================
 
 @app.route('/', methods=['GET', 'POST'])
@@ -219,7 +219,6 @@ def load_unified_viewport():
                 logger.error(f"Inbound log stream processing error: {e}")
 
     computed_metrics = execute_vaccine_design_pipeline(patient_mutations_dataset, patient_typed_hlas)
-    # Renders the clean index file inside templates folder directly
     return render_template('index.html', data=computed_metrics)
 
 @app.route('/api/v1/analytics', methods=['GET'])
