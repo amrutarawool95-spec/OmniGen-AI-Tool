@@ -26,7 +26,6 @@ def execute_computational_pipeline(file_content=""):
     # Format-agnostic sequence parser extraction using regex tokens
     extracted_genes = []
     if file_content:
-        # Match standard genomic nomenclature tokens within uploaded streams
         matches = re.findall(r'(KRAS|IDH1|BRAF|EGFR|NRAS|TP53)', file_content, re.IGNORECASE)
         extracted_genes = [g.upper() for g in matches]
 
@@ -35,7 +34,7 @@ def execute_computational_pipeline(file_content=""):
         current_ccf = item["ccf"]
         current_tpm = item["tpm"]
         
-        # Boost matrix metrics if mutations are explicitly discovered in the text stream
+        # Dynamically adjust and score parameters if explicit matches are present in the uploaded stream
         if extracted_genes and item["gene"] in extracted_genes:
             current_ccf = min(1.00, current_ccf * 1.1)
             current_tpm = current_tpm * 1.2
@@ -141,7 +140,7 @@ UI_TEMPLATE = """
                 </form>
 
                 <div class="text-[10px] text-slate-500 flex justify-between items-center font-mono-variant border-t border-purple-900/20 pt-2">
-                    <span>Status: Dynamic Processing Mode</span>
+                    <span>Status: Ingestion System Ready</span>
                     <span class="text-purple-400">v4.1-pan</span>
                 </div>
             </div>
@@ -183,15 +182,16 @@ UI_TEMPLATE = """
                     <p class="text-[11px] text-slate-400 mt-1">Real-time optimization models based on input parameters</p>
                 </div>
                 <div class="bg-[#050716]/60 rounded-xl p-3 border border-purple-900/30 font-mono-variant text-[10px] text-slate-300 space-y-1.5">
-                    <div class="flex items-center justify-between"><span class="text-cyan-400">[SYSTEM]</span><span>Variants Analyzed</span></div>
+                    <div class="flex items-center justify-between"><span class="text-cyan-400">[SYSTEM]</span><span>Pipeline Complete</span></div>
                     <div class="flex items-center justify-between"><span class="text-purple-400">[FILTER]</span><span>Expressed: {{ data|length }} Matches</span></div>
-                    <div class="flex items-center justify-between"><span class="text-amber-400">[PIPELINE]</span><span class="font-bold">Matrix Evaluated</span></div>
+                    <div class="flex items-center justify-between"><span class="text-amber-400">[DATA]</span><span class="font-bold">Matrix Rendered</span></div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 grid-cols-3 gap-6">
-            <div class="xl:col-span-2 glass-panel rounded-2xl overflow-hidden flex flex-col">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-purple-900/20 bg-[#0d1430]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h3 class="text-xs font-bold uppercase tracking-widest text-white font-mono-variant">Predictive Structural Rankings Matrix</h3>
@@ -210,7 +210,7 @@ UI_TEMPLATE = """
                                 <th class="py-3 px-4">Rank</th>
                                 <th class="py-3 px-4">Gene Core</th>
                                 <th class="py-3 px-4">Mutation</th>
-                                <th class="py-3 px-4">HLA Restriction Locus</th>
+                                <th class="py-3 px-4">HLA Restriction</th>
                                 <th class="py-3 px-4">RNA (TPM)</th>
                                 <th class="py-3 px-4">CCF Weight</th>
                                 <th class="py-3 px-4 text-right">Fitness Score</th>
@@ -233,7 +233,7 @@ UI_TEMPLATE = """
                 </div>
             </div>
 
-            <div class="xl:col-span-1 glass-panel p-5 rounded-2xl flex flex-col justify-between">
+            <div class="lg:col-span-1 glass-panel p-5 rounded-2xl flex flex-col justify-between">
                 <div>
                     <h3 class="text-xs font-bold uppercase tracking-widest text-white font-mono-variant flex items-center gap-2 mb-1">
                         <i class="fa-solid fa-chart-simple text-purple-500"></i> Ingested Target Contribution
@@ -247,7 +247,7 @@ UI_TEMPLATE = """
 
                 <div class="border-t border-purple-900/20 pt-3 flex justify-between items-center text-[10px] font-mono-variant text-slate-400">
                     <span>Target Total: {{ data|length }}</span>
-                    <span class="text-cyan-400">Calculation: Success</span>
+                    <span class="text-cyan-400">Calculation: Active</span>
                 </div>
             </div>
         </div>
@@ -287,11 +287,11 @@ UI_TEMPLATE = """
                     labels: categoryLabels,
                     datasets: [{
                         data: absoluteScores,
-                        backgroundColor: 'rgba(147, 51, 234, 0.65)',
+                        backgroundColor: 'rgba(147, 51, 234, 0.55)',
                         borderColor: '#a855f7',
                         borderWidth: 1.5,
                         borderRadius: 6,
-                        hoverBackgroundColor: 'rgba(6, 182, 212, 0.8)',
+                        hoverBackgroundColor: 'rgba(6, 182, 212, 0.75)',
                         hoverBorderColor: '#06b6d4'
                     }]
                 },
@@ -340,4 +340,4 @@ def pull_raw_json_feed():
 if __name__ == '__main__':
     target_network_port = int(os.environ.get('PORT', 5000))
     app.run(host="0.0.0.0", port=target_network_port, debug=False)
-    
+        
