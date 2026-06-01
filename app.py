@@ -17,40 +17,29 @@ def run_genomics_matrix_pipeline():
         {"gene": "BRAF", "mutation": "p.Val600Glu", "allele": "HLA-B*44:02", "peptide": "GLANECEIYI", "ic50": 87.9, "wt_ic50": 468.0, "tpm": 178.6, "ccf": 0.91},
         {"gene": "EGFR", "mutation": "p.Leu858Arg", "allele": "HLA-C*07:01", "peptide": "KITDFGRAK", "ic50": 142.0, "wt_ic50": 639.0, "tpm": 89.4, "ccf": 0.72},
         {"gene": "NRAS", "mutation": "p.Gln61His", "allele": "HLA-A*02:01", "peptide": "ILDTAGHRE", "ic50": 495.2, "wt_ic50": 1010.2, "tpm": 5.1, "ccf": 0.34},
-        {"gene": "TP53", "mutation": "p.Arg273His", "allele": "HLA-A*02:01", "peptide": "LLGRNSFEV", "ic50": 850.0, "wt_ic50": 900.0, "tpm": 0.2, "ccf": 0.95} # Will be filtered out (TPM < 1.0)
+        {"gene": "TP53", "mutation": "p.Arg273His", "allele": "HLA-A*02:01", "peptide": "LLGRNSFEV", "ic50": 850.0, "wt_ic50": 900.0, "tpm": 0.2, "ccf": 0.95}
     ]
     
     processed_candidates = []
     for item in raw_variants:
-        # Filter: Exclude non-expressed variants from the clinical trial selection
         if item["tpm"] <= 1.0:
             continue
             
-        # Compute Differential Agretopicity Index (DAI)
         dai = round(math.log2(item["wt_ic50"] / item["ic50"]), 2) if item["ic50"] > 0 else 0.0
         
-        # Calculate calculated immunogenicity rating profile
         binding_weight = 1.0 / (1.0 + math.exp((item["ic50"] - 150) / 50))
         expression_factor = math.log10(item["tpm"] + 1)
         raw_score = binding_weight * (1 + (dai * 0.15)) * expression_factor * item["ccf"]
         score = round(min(0.999, max(0.001, raw_score)), 3)
         
         processed_candidates.append({
-            "rank": 0,
-            "gene": item["gene"],
-            "mutation": item["mutation"],
-            "allele": item["allele"],
-            "peptide": item["peptide"],
-            "ic50": item["ic50"],
-            "dai": dai,
-            "tpm": item["tpm"],
-            "ccf": item["ccf"],
-            "score": score
+            "rank": 0, "gene": item["gene"], "mutation": item["mutation"], 
+            "allele": item["allele"], "peptide": item["peptide"], 
+            "ic50": item["ic50"], "dai": dai, "tpm": item["tpm"], 
+            "ccf": item["ccf"], "score": score
         })
         
-    # Sort descending based on calculated fitness criteria matrix score
     processed_candidates = sorted(processed_candidates, key=lambda x: x["score"], reverse=True)
-    
     for index, candidate in enumerate(processed_candidates, start=1):
         candidate["rank"] = index
         
@@ -94,7 +83,6 @@ UI_TEMPLATE = """
     </nav>
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        
         <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-lg font-bold text-slate-900">Patient Screening Grid View</h1>
@@ -125,7 +113,6 @@ UI_TEMPLATE = """
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
             <div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden shadow-sm">
                 <div class="p-4 bg-white border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div>
@@ -183,7 +170,6 @@ UI_TEMPLATE = """
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 
@@ -252,5 +238,7 @@ def query_variants_data_feed():
     return jsonify({"status": "success", "data": run_genomics_matrix_pipeline()})
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=False)
-  
+    # CRITICAL RENDER NETWORK MATCHING: Read dynamic environment port mapping definitions
+    bind_port = int(os.environ.get('PORT', 5000))
+    app.run(host="0.0.0.0", port=bind_port, debug=False)
+    
