@@ -34,23 +34,17 @@ def execute_computational_pipeline(file_content=""):
         current_ccf = item["ccf"]
         current_tpm = item["tpm"]
         
-        # Boost parameters if mutations are discovered inside the uploaded data file stream
         if extracted_genes and item["gene"] in extracted_genes:
             current_ccf = min(1.00, current_ccf * 1.1)
             current_tpm = current_tpm * 1.2
 
-        # Stage 7 Filter: Requirement of Transcripts Per Million > 1.0
         if current_tpm <= 1.0:
             continue
 
-        # Mathematical core: Differential Agretopicity Index calculation
         dai = round(math.log2(item["wt_ic50"] / item["ic50"]), 2) if item["ic50"] > 0 else 0.0
-        
-        # Neural Network Affinity weight mapping conversion
         binding_weight = 1.0 / (1.0 + math.exp((item["ic50"] - 150) / 50))
         expression_factor = math.log10(current_tpm + 1)
         
-        # Final integrated multi-parametric structural risk equation
         raw_score = binding_weight * (1 + (dai * 0.15)) * expression_factor * current_ccf
         score = round(min(0.999, max(0.001, raw_score)), 3)
 
@@ -61,7 +55,6 @@ def execute_computational_pipeline(file_content=""):
             "ccf": round(current_ccf, 2), "score": score
         })
 
-    # Sort descending based on calculated programmatic ranking values
     processed_candidates = sorted(processed_candidates, key=lambda x: x["score"], reverse=True)
     for index, candidate in enumerate(processed_candidates, start=1):
         candidate["rank"] = index
@@ -346,4 +339,13 @@ def load_unified_viewport():
             except Exception:
                 pass
                 
-    computed_metrics = execute_computati
+    computed_metrics = execute_computational_pipeline(incoming_string_stream)
+    return render_template_string(UI_TEMPLATE, data=computed_metrics)
+
+@app.route('/api/v1/analytics', methods=['GET'])
+def pull_raw_json_feed():
+    return jsonify({"status": "success", "nodes": execute_computational_pipeline()})
+
+if __name__ == '__main__':
+    target_network_port = int(os.environ.get('PORT', 5000))
+    app.run(host="0.0.0.0", port=target_network_port)
