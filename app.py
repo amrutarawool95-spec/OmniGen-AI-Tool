@@ -34,7 +34,7 @@ def execute_computational_pipeline(file_content=""):
         current_ccf = item["ccf"]
         current_tpm = item["tpm"]
         
-        # Dynamically adjust and score parameters if explicit matches are present in the uploaded stream
+        # Boost and tweak parameters if mutations are discovered inside the uploaded data file stream
         if extracted_genes and item["gene"] in extracted_genes:
             current_ccf = min(1.00, current_ccf * 1.1)
             current_tpm = current_tpm * 1.2
@@ -113,7 +113,7 @@ UI_TEMPLATE = """
         </div>
         <div class="flex items-center space-x-4">
             <span class="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-cyan-950/50 text-cyan-400 border border-cyan-800/40">
-                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Service Active
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Core Active
             </span>
         </div>
     </header>
@@ -127,21 +127,34 @@ UI_TEMPLATE = """
                     <h2 class="text-xs font-bold uppercase tracking-widest text-purple-400 font-mono-variant flex items-center gap-2">
                         <i class="fa-solid fa-cloud-arrow-up text-cyan-400"></i> Agnostic Ingestion Port
                     </h2>
-                    <p class="text-[11px] text-slate-400 mt-1">Submit high-throughput sequencing configurations (VCF, SNP, CSV, PDF)</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Submit sequencing configurations (VCF, SNP, CSV, PDF)</p>
                 </div>
 
-                <form id="ingestionForm" action="/" method="POST" enctype="multipart/form-data" class="relative group border border-dashed border-purple-500/20 hover:border-cyan-500/40 bg-[#050716]/40 p-4 rounded-xl transition-all cursor-pointer text-center">
-                    <input type="file" name="genomic_file" onchange="document.getElementById('ingestionForm').submit();" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                    <div class="space-y-2">
-                        <i class="fa-solid fa-dna text-xl text-purple-500/60 group-hover:text-cyan-400 transition-colors animate-pulse"></i>
-                        <span class="block text-xs font-semibold text-slate-300">Drop clinical sequence matrix</span>
-                        <span class="block text-[10px] text-slate-500">Automated structural validation</span>
+                <form action="/" method="POST" enctype="multipart/form-data" class="space-y-3">
+                    <div class="relative group border border-dashed border-purple-500/20 hover:border-cyan-500/40 bg-[#050716]/40 p-4 rounded-xl transition-all text-center">
+                        <input type="file" name="genomic_file" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required>
+                        <div class="space-y-1">
+                            <i class="fa-solid fa-dna text-xl text-purple-500/60 group-hover:text-cyan-400 transition-colors"></i>
+                            <span class="block text-xs font-semibold text-slate-300 id='fileNameDisplay'">Choose sequencing file</span>
+                            <span class="block text-[9px] text-slate-500">Supports standard genomic text logs</span>
+                        </div>
                     </div>
+                    
+                    <button type="submit" class="w-full py-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold rounded-xl text-xs hover:from-purple-500 hover:to-cyan-500 shadow-md transition-all font-mono-variant uppercase tracking-wider flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Execute Ingestion Pipeline
+                    </button>
                 </form>
 
-                <div class="text-[10px] text-slate-500 flex justify-between items-center font-mono-variant border-t border-purple-900/20 pt-2">
-                    <span>Status: Ingestion System Ready</span>
-                    <span class="text-purple-400">v4.1-pan</span>
+                <script>
+                    document.getElementById('fileInput').addEventListener('change', function(e){
+                        var name = e.target.files[0] ? e.target.files[0].name : "Selected";
+                        alert("File staged successfully: " + name + "\\n\\nClick the 'Execute Ingestion Pipeline' button below to load graphics.");
+                    });
+                </script>
+
+                <div class="text-[10px] text-slate-500 flex justify-between items-center font-mono-variant border-t border-purple-900/20 pt-1">
+                    <span>Target state context</span>
+                    <span class="text-purple-400">v4.1</span>
                 </div>
             </div>
 
@@ -181,10 +194,10 @@ UI_TEMPLATE = """
                     </h2>
                     <p class="text-[11px] text-slate-400 mt-1">Real-time optimization models based on input parameters</p>
                 </div>
-                <div class="bg-[#050716]/60 rounded-xl p-3 border border-purple-900/30 font-mono-variant text-[10px] text-slate-300 space-y-1.5">
-                    <div class="flex items-center justify-between"><span class="text-cyan-400">[SYSTEM]</span><span>Pipeline Complete</span></div>
-                    <div class="flex items-center justify-between"><span class="text-purple-400">[FILTER]</span><span>Expressed: {{ data|length }} Matches</span></div>
-                    <div class="flex items-center justify-between"><span class="text-amber-400">[DATA]</span><span class="font-bold">Matrix Rendered</span></div>
+                <div class="bg-[#050716]/60 rounded-xl p-3 border border-purple-900/30 font-mono-variant text-[10px] text-slate-300 space-y-1">
+                    <div class="flex items-center justify-between"><span class="text-cyan-400">[SYSTEM]</span><span>Active Deployment</span></div>
+                    <div class="flex items-center justify-between"><span class="text-purple-400">[FILTER]</span><span>Expressed: {{ data|length }} Models</span></div>
+                    <div class="flex items-center justify-between"><span class="text-amber-400">[DATA]</span><span class="font-bold">Matrix Compiled</span></div>
                 </div>
             </div>
         </div>
@@ -247,7 +260,7 @@ UI_TEMPLATE = """
 
                 <div class="border-t border-purple-900/20 pt-3 flex justify-between items-center text-[10px] font-mono-variant text-slate-400">
                     <span>Target Total: {{ data|length }}</span>
-                    <span class="text-cyan-400">Calculation: Active</span>
+                    <span class="text-cyan-400">Calculation: Success</span>
                 </div>
             </div>
         </div>
@@ -330,14 +343,4 @@ def load_unified_viewport():
             except Exception:
                 pass
                 
-    computed_metrics = execute_computational_pipeline(incoming_string_stream)
-    return render_template_string(UI_TEMPLATE, data=computed_metrics)
-
-@app.route('/api/v1/analytics', methods=['GET'])
-def pull_raw_json_feed():
-    return jsonify({"status": "success", "nodes": execute_computational_pipeline()})
-
-if __name__ == '__main__':
-    target_network_port = int(os.environ.get('PORT', 5000))
-    app.run(host="0.0.0.0", port=target_network_port, debug=False)
-        
+    computed_metrics = execute_computational_pi
